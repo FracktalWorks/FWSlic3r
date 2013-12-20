@@ -45,7 +45,7 @@ sub new {
     
     my $class_prefix = $self->{mode} eq 'simple' ? "Slic3r::GUI::SimpleTab::" : "Slic3r::GUI::Tab::";
     my $init = 0;
-    for my $tab_name (qw(print filament printer)) {
+    for my $tab_name (qw(settings)) {
         my $tab;
         $tab = $self->{options_tabs}{$tab_name} = ($class_prefix . ucfirst $tab_name)->new(
             $self->{tabpanel},
@@ -173,7 +173,7 @@ sub quick_slice {
                 output_file => $output_file,
                 status_cb   => sub {
                     my ($percent, $message) = @_;
-                    if (&Wx::wxVERSION_STRING =~ / 2\.(8\.|9\.[2-9])/) {
+                    if (&Wx::wxVERSION_STRING =~ "2\.(8\.|9\.[2-9])" ) {
                         $process_dialog->Update($percent, "$message…");
                     }
                 },
@@ -244,7 +244,7 @@ sub extra_variables {
     my %extra_variables = ();
     if ($self->{mode} eq 'expert') {
         $extra_variables{"${_}_preset"} = $self->{options_tabs}{$_}->current_preset->{name}
-            for qw(print filament printer);
+            for qw(settings);
     }
     return { %extra_variables };
 }
@@ -394,31 +394,30 @@ sub config {
     my $self = shift;
     
     # retrieve filament presets and build a single config object for them
-    my $filament_config;
-    if (!$self->{plater} || $self->{plater}->filament_presets == 1 || $self->{mode} eq 'simple') {
-        $filament_config = $self->{options_tabs}{filament}->config;
+    my $settings_config;
+    if (!$self->{plater} || $self->{plater}->settings_presets == 1 || $self->{mode} eq 'simple') {
+        $settings_config = $self->{options_tabs}{settings}->config;
     } else {
         # TODO: handle dirty presets.
         # perhaps plater shouldn't expose dirty presets at all in multi-extruder environments.
-        foreach my $preset_idx ($self->{plater}->filament_presets) {
-            my $preset = $self->{options_tabs}{filament}->get_preset($preset_idx);
-            my $config = $self->{options_tabs}{filament}->get_preset_config($preset);
-            if (!$filament_config) {
-                $filament_config = $config;
+        foreach my $preset_idx ($self->{plater}->settings_presets) {
+            my $preset = $self->{options_tabs}{settings}->get_preset($preset_idx);
+            my $config = $self->{options_tabs}{settings}->get_preset_config($preset);
+            if (!$settings_config) {
+                $settings_config = $config;
                 next;
             }
             foreach my $opt_key (keys %$config) {
-                next unless ref $filament_config->get($opt_key) eq 'ARRAY';
-                push @{ $filament_config->get($opt_key) }, $config->get($opt_key)->[0];
+                next unless ref $settings_config->get($opt_key) eq 'ARRAY';
+                push @{ $settings_config->get($opt_key) }, $config->get($opt_key)->[0];
             }
         }
     }
     
     my $config = Slic3r::Config->merge(
         Slic3r::Config->new_from_defaults,
-        $self->{options_tabs}{print}->config,
-        $self->{options_tabs}{printer}->config,
-        $filament_config,
+        $self->{options_tabs}{settings}->config,
+        $settings_config,
     );
     
     if ($self->{mode} eq 'simple') {
@@ -427,7 +426,7 @@ sub config {
         $config->set('avoid_crossing_perimeters', 1);
         $config->set('infill_every_layers', 10);
     } else {
-        my $extruders_count = $self->{options_tabs}{printer}{extruders_count};
+        my $extruders_count = $self->{options_tabs}{settings}{extruders_count};
         $config->set("${_}_extruder", min($config->get("${_}_extruder"), $extruders_count))
             for qw(perimeter infill support_material support_material_interface);
     }

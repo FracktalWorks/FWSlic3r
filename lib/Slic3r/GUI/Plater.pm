@@ -230,13 +230,11 @@ sub new {
         if ($self->skeinpanel->{mode} eq 'expert') {
             $presets = Wx::BoxSizer->new(wxVERTICAL);
             my %group_labels = (
-                print       => 'Print settings',
-                filament    => 'Filament',
-                printer     => 'Printer',
+                settings       => 'Settings',
             );
             $self->{preset_choosers} = {};
             $self->{preset_choosers_sizers} = {};
-            for my $group (qw(print filament printer)) {
+            for my $group (qw(settings)) {        
                 my $text = Wx::StaticText->new($self, -1, "$group_labels{$group}:", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
                 $text->SetFont($Slic3r::GUI::small_font);
                 my $choice = Wx::Choice->new($self, -1, wxDefaultPosition, [140, -1], []);
@@ -323,11 +321,11 @@ sub on_select_preset {
 	my $self = shift;
 	my ($group, $choice) = @_;
 	
-	if ($group eq 'filament' && @{$self->{preset_choosers}{filament}} > 1) {
-		my @filament_presets = $self->filament_presets;
-		$Slic3r::GUI::Settings->{presets}{filament} = $choice->GetString($filament_presets[0]) . ".ini";
-		$Slic3r::GUI::Settings->{presets}{"filament_${_}"} = $choice->GetString($filament_presets[$_])
-			for 1 .. $#filament_presets;
+	if ($group eq 'settings' && @{$self->{preset_choosers}{settings}} > 1) {
+		my @settings_presets = $self->settings_presets;
+		$Slic3r::GUI::Settings->{presets}{settings} = $choice->GetString($settings_presets[0]) . ".ini";
+		$Slic3r::GUI::Settings->{presets}{"settings_${_}"} = $choice->GetString($settings_presets[$_])
+			for 1 .. $#settings_presets;
 		Slic3r::GUI->save_settings;
 		return;
 	}
@@ -352,10 +350,10 @@ sub update_presets {
     $self->{preset_choosers}{$group}[0]->SetSelection($selected);
 }
 
-sub filament_presets {
+sub settings_presets {
     my $self = shift;
     
-    return map $_->GetSelection, @{ $self->{preset_choosers}{filament} };
+    return map $_->GetSelection, @{ $self->{preset_choosers}{settings} };
 }
 
 sub load {
@@ -895,18 +893,18 @@ sub on_config_change {
     my $self = shift;
     my ($opt_key, $value) = @_;
     if ($opt_key eq 'extruders_count' && defined $value) {
-        my $choices = $self->{preset_choosers}{filament};
+        my $choices = $self->{preset_choosers}{settings};
         while (@$choices < $value) {
         	my @presets = $choices->[0]->GetStrings;
             push @$choices, Wx::Choice->new($self, -1, wxDefaultPosition, [150, -1], [@presets]);
             $choices->[-1]->SetFont($Slic3r::GUI::small_font);
-            $self->{preset_choosers_sizers}{filament}->Add($choices->[-1], 0, wxEXPAND | wxBOTTOM, FILAMENT_CHOOSERS_SPACING);
-            EVT_CHOICE($choices->[-1], $choices->[-1], sub { $self->on_select_preset('filament', @_) });
-            my $i = first { $choices->[-1]->GetString($_) eq ($Slic3r::GUI::Settings->{presets}{"filament_" . $#$choices} || '') } 0 .. $#presets;
+            $self->{preset_choosers_sizers}{settings}->Add($choices->[-1], 0, wxEXPAND | wxBOTTOM, FILAMENT_CHOOSERS_SPACING);
+            EVT_CHOICE($choices->[-1], $choices->[-1], sub { $self->on_select_preset('settings', @_) });
+            my $i = first { $choices->[-1]->GetString($_) eq ($Slic3r::GUI::Settings->{presets}{"settings_" . $#$choices} || '') } 0 .. $#presets;
         	$choices->[-1]->SetSelection($i || 0);
         }
         while (@$choices > $value) {
-            $self->{preset_choosers_sizers}{filament}->Remove(-1);
+            $self->{preset_choosers_sizers}{settings}->Remove(-1);
             $choices->[-1]->Destroy;
             pop @$choices;
         }

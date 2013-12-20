@@ -387,16 +387,17 @@ sub load_config_file {
     $self->on_presets_changed;
 }
 
-package Slic3r::GUI::Tab::Print;
-use base 'Slic3r::GUI::Tab';
 
-sub name { 'print' }
-sub title { 'Print Settings' }
+package Slic3r::GUI::Tab::Settings;
+use base 'Slic3r::GUI::Tab';
+sub hidden_options { !$Slic3r::have_threads ? qw(threads) : () }
+sub name { 'settings' }
+sub title { 'Settings' }
 
 sub build {
     my $self = shift;
-    
-    $self->add_options_page('Layers and perimeters', 'layers.png', optgroups => [
+
+$self->add_options_page('Layers and perimeters', 'layers.png', optgroups => [
         {
             title => 'Layer height',
             options => [qw(layer_height first_layer_height)],
@@ -554,19 +555,7 @@ sub build {
             options => [($Slic3r::have_threads ? qw(threads) : ()), qw(resolution)],
         },
     ]);
-}
 
-sub hidden_options { !$Slic3r::have_threads ? qw(threads) : () }
-
-package Slic3r::GUI::Tab::Filament;
-use base 'Slic3r::GUI::Tab';
-
-sub name { 'filament' }
-sub title { 'Filament Settings' }
-
-sub build {
-    my $self = shift;
-    
     $self->add_options_page('Filament', 'spool.png', optgroups => [
         {
             title => 'Filament',
@@ -619,54 +608,8 @@ sub build {
             options => [qw(fan_below_layer_time slowdown_below_layer_time min_print_speed)],
         },
     ]);
-}
 
-sub _update_description {
-    my $self = shift;
-    
-    my $config = $self->config;
-    
-    my $msg = "";
-    my $fan_other_layers = $config->fan_always_on
-        ? sprintf "will always run at %d%%%s.", $config->min_fan_speed,
-                ($config->disable_fan_first_layers > 1
-                    ? " except for the first " . $config->disable_fan_first_layers . " layers"
-                    : $config->disable_fan_first_layers == 1
-                        ? " except for the first layer"
-                        : "")
-        : "will be turned off.";
-    
-    if ($config->cooling) {
-        $msg = sprintf "If estimated layer time is below ~%ds, fan will run at %d%% and print speed will be reduced so that no less than %ds are spent on that layer (however, speed will never be reduced below %dmm/s).",
-            $config->slowdown_below_layer_time, $config->max_fan_speed, $config->slowdown_below_layer_time, $config->min_print_speed;
-        if ($config->fan_below_layer_time > $config->slowdown_below_layer_time) {
-            $msg .= sprintf "\nIf estimated layer time is greater, but still below ~%ds, fan will run at a proportionally decreasing speed between %d%% and %d%%.",
-                $config->fan_below_layer_time, $config->max_fan_speed, $config->min_fan_speed;
-        }
-        $msg .= "\nDuring the other layers, fan $fan_other_layers"
-    } else {
-        $msg = "Fan $fan_other_layers";
-    }
-    $self->{description_line}->SetText($msg);
-}
 
-sub on_value_change {
-    my $self = shift;
-    my ($opt_key) = @_;
-    $self->SUPER::on_value_change(@_);
-    
-    $self->_update_description;
-}
-
-package Slic3r::GUI::Tab::Printer;
-use base 'Slic3r::GUI::Tab';
-
-sub name { 'printer' }
-sub title { 'Printer Settings' }
-
-sub build {
-    my $self = shift;
-    
     $self->{extruders_count} = 1;
     
     $self->add_options_page('General', 'printer_empty.png', optgroups => [
@@ -723,7 +666,50 @@ sub build {
     
     $self->{extruder_pages} = [];
     $self->_build_extruder_pages;
+
+
+
+
 }
+
+sub _update_description {
+    my $self = shift;
+    
+    my $config = $self->config;
+    
+    my $msg = "";
+    my $fan_other_layers = $config->fan_always_on
+        ? sprintf "will always run at %d%%%s.", $config->min_fan_speed,
+                ($config->disable_fan_first_layers > 1
+                    ? " except for the first " . $config->disable_fan_first_layers . " layers"
+                    : $config->disable_fan_first_layers == 1
+                        ? " except for the first layer"
+                        : "")
+        : "will be turned off.";
+    
+    if ($config->cooling) {
+        $msg = sprintf "If estimated layer time is below ~%ds, fan will run at %d%% and print speed will be reduced so that no less than %ds are spent on that layer (however, speed will never be reduced below %dmm/s).",
+            $config->slowdown_below_layer_time, $config->max_fan_speed, $config->slowdown_below_layer_time, $config->min_print_speed;
+        if ($config->fan_below_layer_time > $config->slowdown_below_layer_time) {
+            $msg .= sprintf "\nIf estimated layer time is greater, but still below ~%ds, fan will run at a proportionally decreasing speed between %d%% and %d%%.",
+                $config->fan_below_layer_time, $config->max_fan_speed, $config->min_fan_speed;
+        }
+        $msg .= "\nDuring the other layers, fan $fan_other_layers"
+    } else {
+        $msg = "Fan $fan_other_layers";
+    }
+    $self->{description_line}->SetText($msg);
+}
+
+sub on_value_change {
+    my $self = shift;
+    my ($opt_key) = @_;
+    $self->SUPER::on_value_change(@_);
+    
+    $self->_update_description;
+}
+
+
 
 sub _extruder_options { qw(nozzle_diameter extruder_offset retract_length retract_lift retract_speed retract_restart_extra retract_before_travel wipe
     retract_layer_change retract_length_toolchange retract_restart_extra_toolchange) }
@@ -780,7 +766,7 @@ sub _build_extruder_pages {
     );
 }
 
-sub on_value_change {
+sub on_value_change_printer {
     my $self = shift;
     my ($opt_key) = @_;
     $self->SUPER::on_value_change(@_);
@@ -811,7 +797,7 @@ sub on_preset_loaded {
         $self->set_value('extruders_count', scalar @{ $self->{config}->nozzle_diameter });
         
         # update extruder page list
-        $self->on_value_change('extruders_count');
+        $self->on_value_change_printer('extruders_count');
     }
 }
 

@@ -52,7 +52,7 @@ our @cb;
 
 our $Settings = {
     _ => {
-        mode => 'simple',
+        mode => 'expert',
         version_check => 1,
     },
 };
@@ -76,7 +76,7 @@ sub OnInit {
     $datadir = Slic3r::encode_path($datadir);
     Slic3r::debugf "Data directory: %s\n", $datadir;
     my $run_wizard = (-d $datadir) ? 0 : 1;
-    for ($datadir, "$datadir/print", "$datadir/filament", "$datadir/printer") {
+    for ($datadir, "$datadir/settings") {
         mkdir or $self->fatal_error("Slic3r was unable to create its data directory at $_ (errno: $!).")
             unless -d $_;
     }
@@ -210,15 +210,15 @@ sub OnInit {
     $frame->Show;
     $frame->Layout;
     
-    if (!$run_wizard && (!defined $last_version || $last_version ne $Slic3r::VERSION)) {
-        # user was running another Slic3r version on this computer
-        if (!defined $last_version || $last_version =~ /^0\./) {
-            show_info($self->{skeinpanel}, "Hello! Support material was improved since the "
-                . "last version of Slic3r you used. It is strongly recommended to revert "
-                . "your support material settings to the factory defaults and start from "
-                . "those. Enjoy and provide feedback!", "Support Material");
-        }
-    }
+    # if (!$run_wizard && (!defined $last_version || $last_version ne $Slic3r::VERSION)) {
+    #     # user was running another Slic3r version on this computer
+    #     if (!defined $last_version || $last_version =~ /^0\./) {
+    #         show_info($self->{skeinpanel}, "Hello! Support material was improved since the "
+    #             . "last version of Slic3r you used. It is strongly recommended to revert "
+    #             . "your support material settings to the factory defaults and start from "
+    #             . "those. Enjoy and provide feedback!", "Support Material");
+    #     }
+    # }
     $self->{skeinpanel}->config_wizard if $run_wizard;
     
     Slic3r::GUI->check_version

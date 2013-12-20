@@ -98,13 +98,13 @@ sub on_value_change {
     $self->{on_value_change}->(@_) if $self->{on_value_change};
 }
 
-package Slic3r::GUI::SimpleTab::Print;
+package Slic3r::GUI::SimpleTab::Settings;
 use base 'Slic3r::GUI::SimpleTab';
 
 use Wx qw(:sizer);
 
-sub name { 'print' }
-sub title { 'Print Settings' }
+sub name { 'settings' }
+sub title { 'Settings' }
 
 sub build {
     my $self = shift;
@@ -153,18 +153,7 @@ sub build {
             },
         ],
     );
-}
-
-package Slic3r::GUI::SimpleTab::Filament;
-use base 'Slic3r::GUI::SimpleTab';
-
-sub name { 'filament' }
-sub title { 'Filament Settings' }
-
-sub build {
-    my $self = shift;
-    
-    $self->append_optgroup(
+     $self->append_optgroup(
         title => 'Filament',
         options => ['filament_diameter#0', 'extrusion_multiplier#0'],
     );
@@ -183,18 +172,7 @@ sub build {
             },
         ],
     );
-}
-
-package Slic3r::GUI::SimpleTab::Printer;
-use base 'Slic3r::GUI::SimpleTab';
-
-sub name { 'printer' }
-sub title { 'Printer Settings' }
-
-sub build {
-    my $self = shift;
-    
-    $self->append_optgroup(
+     $self->append_optgroup(
         title => 'Size and coordinates',
         options => [qw(bed_size print_center z_offset)],
     );
