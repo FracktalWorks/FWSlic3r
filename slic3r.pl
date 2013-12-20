@@ -4,23 +4,36 @@ use strict;
 use warnings;
 
 BEGIN {
-    use FindBin;
+    use FindBin; 
+    # so that we can use 
+    # $FindBin::Bin  
+    # which is the path to bin directory from where script was invoked
     use lib "$FindBin::Bin/lib";
 }
 
-use Getopt::Long qw(:config no_auto_abbrev);
+use Getopt::Long qw(:config no_auto_abbrev); 
+#to get cl parameters no_auto_abbrev for getting onky full length parameters
 use List::Util qw(first);
+#first is a function which returns the first element where the result from BLOCK is a true value. If BLOCK never returns true or LIST was empty then undef is returned.
 use POSIX qw(setlocale LC_NUMERIC);
+# After a proper POSIX::setlocale() call, Perl obeys the LC_NUMERIC locale information, which controls an application's idea of how numbers should be formatted for human readability by the printf(), sprintf(), and write() functions. String-to-numeric conversion by the POSIX::strtod() function is also affected. In most implementations the only effect is to change the character used for the decimal point--perhaps from "." to ",". These functions aren't aware of such niceties as thousands separation and so on. 
+
 use Slic3r;
 $|++;
+#the above command causes print to flush the buffer preceding the next output.
 
 our %opt = ();
+#hash called opt, hash is nothing but a key value pair.
 my %cli_options = ();
+
 {
+    # that { is just to restrict %option to this scope 
     my %options = (
-        'help'                  => sub { usage() },
+        'help'                  => sub { usage() }, 
+        #value of a hash can be a function! cool! :)
         'version'               => sub { print "$Slic3r::VERSION\n"; exit 0 },
         
+        #By using the backslash operator on a variable, subroutine, or value. (This works much like the & (address-of) operator in C.) This typically creates another reference to a variable, because there's already a reference to the variable in the symbol table. 
         'debug'                 => \$Slic3r::debug,
         'gui'                   => \$opt{gui},
         'o|output=s'            => \$opt{output},
@@ -38,12 +51,15 @@ my %cli_options = ();
         'info'                  => \$opt{info},
     );
     foreach my $opt_key (keys %{$Slic3r::Config::Options}) {
+        #keys operator extracts all keys of hash (key => value pair)
         my $cli = $Slic3r::Config::Options->{$opt_key}->{cli} or next;
         # allow both the dash-separated option name and the full opt_key
+        #gets the refernce of $cli_options{$opt_key} basically creates undef enteries in hash table
         $options{ "$opt_key|$cli" } = \$cli_options{$opt_key};
     }
-    
+    # fills the corrsponding entries into option hash
     GetOptions(%options) or usage(1);
+    #usgae throws error go to last function in this documrnt
 }
 
 # process command line options

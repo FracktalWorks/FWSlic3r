@@ -102,8 +102,8 @@ EOF
         my $version = $modules{$module};
         my @cmd = ($cpanm, "$module~$version");
         if ($module eq 'XML::SAX::ExpatXS' && $^O eq 'MSWin32') {
-            my $mingw = 'C:\dev\CitrusPerl\mingw64';
-            $mingw = 'C:\dev\CitrusPerl\mingw32' if !-d $mingw;
+            my $mingw = 'C:\strawberry\c\x86_64-w64-mingw32';
+            $mingw = 'C:\strawberry\c\x86_64-w64-mingw32' if !-d $mingw;
             if (!-d $mingw) {
                 print "Could not find the MinGW directory at $mingw; skipping XML::SAX::ExpatXS (only needed for faster parsing of AMF files)\n";
             } else {
