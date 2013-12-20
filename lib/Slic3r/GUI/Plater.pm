@@ -609,6 +609,8 @@ sub split_object {
     $self->{canvas}->Refresh;
 }
 
+
+#the heart of slic3r
 sub export_gcode {
     my $self = shift;
     

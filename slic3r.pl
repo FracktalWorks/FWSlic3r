@@ -64,8 +64,10 @@ my %cli_options = ();
 
 # process command line options
 my $cli_config = Slic3r::Config->new_from_cli(%cli_options);
+#paste start_gcode end_gcode layer_gcode and toolchain_gcode
 
 # load configuration files
+#loads external config files if --load=blabla.ini is written
 my @external_configs = ();
 if ($opt{load}) {
     foreach my $configfile (@{$opt{load}}) {
@@ -100,7 +102,7 @@ if (!@ARGV && !$opt{save} && eval "require Slic3r::GUI; 1") {
         $Slic3r::GUI::mode      = $opt{gui_mode};
         $Slic3r::GUI::autosave  = $opt{autosave};
     }
-    $gui = Slic3r::GUI->new;
+    $gui = Slic3r::GUI->new; #starts the timer, gauge god knows why
     setlocale(LC_NUMERIC, 'C');
     $gui->{skeinpanel}->load_config_file($_) for @{$opt{load}};
     $gui->{skeinpanel}->load_config($cli_config);

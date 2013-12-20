@@ -149,7 +149,7 @@ our $Options = {
         sidetext => 'mm',
         serialize   => $serialize_comma,
         deserialize => $deserialize_comma,
-        default => [0.5],
+        default => [0.4],
     },
     'filament_diameter' => {
         label   => 'Diameter',
@@ -159,7 +159,7 @@ our $Options = {
         type    => 'f',
         serialize   => $serialize_comma,
         deserialize => $deserialize_comma,
-        default     => [3],
+        default     => [1.75],
     },
     'extrusion_multiplier' => {
         label   => 'Extrusion multiplier',
@@ -168,7 +168,7 @@ our $Options = {
         type    => 'f',
         serialize   => $serialize_comma,
         deserialize => $deserialize_comma,
-        default => [1],
+        default => [0.95],
     },
     'temperature' => {
         label   => 'Other layers',
@@ -180,7 +180,7 @@ our $Options = {
         max     => 400,
         serialize   => $serialize_comma,
         deserialize => sub { $_[0] ? [ split /,/, $_[0] ] : [0] },
-        default => [200],
+        default => [240],
     },
     'first_layer_temperature' => {
         label   => 'First layer',
@@ -191,7 +191,7 @@ our $Options = {
         serialize   => $serialize_comma,
         deserialize => sub { $_[0] ? [ split /,/, $_[0] ] : [0] },
         max     => 400,
-        default => [200],
+        default => [240],
     },
     
     # extruder mapping
@@ -252,7 +252,7 @@ our $Options = {
         cli     => 'first-layer-bed-temperature=i',
         type    => 'i',
         max     => 300,
-        default => 0,
+        default => 110,
     },
     'bed_temperature' => {
         label   => 'Other layers',
@@ -262,7 +262,7 @@ our $Options = {
         cli     => 'bed-temperature=i',
         type    => 'i',
         max     => 300,
-        default => 0,
+        default => 110,
     },
     
     # speed options
@@ -408,12 +408,23 @@ our $Options = {
     
     # accuracy options
     'layer_height' => {
-        label   => 'Layer height',
+        # label   => 'Layer height',
+        # tooltip => 'This setting controls the height (and thus the total number) of the slices/layers. Thinner layers give better accuracy but take more time to print.',
+        # sidetext => 'mm',
+        # cli     => 'layer-height=f',
+        # type    => 'f',
+        # default => 0.4,
+        label   => 'Height Resolution',
         tooltip => 'This setting controls the height (and thus the total number) of the slices/layers. Thinner layers give better accuracy but take more time to print.',
-        sidetext => 'mm',
+        scope   => 'object',
+        category => 'Layers and Perimeters',
         cli     => 'layer-height=f',
-        type    => 'f',
-        default => 0.4,
+        type    => 'select',
+        values  => [qw<0.1 0.2 0.3>],
+        labels  => [qw<High Medium Low>],
+        default => '0.2',
+
+
     },
     'first_layer_height' => {
         label   => 'First layer height',
@@ -423,6 +434,7 @@ our $Options = {
         type    => 'f',
         ratio_over => 'layer_height',
         default => 0.35,
+        readonly => 1,
     },
     'infill_every_layers' => {
         label   => 'Combine infill every',
@@ -585,7 +597,7 @@ our $Options = {
         type    => 'select',
         values  => [qw(rectilinear line concentric honeycomb hilbertcurve archimedeanchords octagramspiral)],
         labels  => [qw(rectilinear line concentric honeycomb), 'hilbertcurve (slow)', 'archimedeanchords (slow)', 'octagramspiral (slow)'],
-        default => 'honeycomb',
+        default => 'rectilinear',
     },
     'solid_fill_pattern' => {
         label   => 'Top/bottom fill pattern',
@@ -600,12 +612,14 @@ our $Options = {
     },
     'fill_density' => {
         label   => 'Fill density',
-        tooltip => 'Density of internal infill, expressed in the range 0 - 1.',
+        tooltip => "Density of internal infill\nHollow, Low, Medium or High",
         scope   => 'object',
         category => 'Infill',
-        cli     => 'fill-density=f',
-        type    => 'f',
-        default => 0.4,
+        cli     => 'fill-density=s',
+        type    => 'select',
+        values  => [qw(0 0.06 0.15 0.4)],
+        labels  => [qw(Hollow Low Medium High)],
+        default => '0.15',
     },
     'fill_angle' => {
         label   => 'Fill angle',
@@ -615,6 +629,7 @@ our $Options = {
         type    => 'i',
         max     => 359,
         default => 45,
+        readonly => 1,
     },
     'solid_infill_below_area' => {
         label   => 'Solid infill threshold area',
@@ -820,6 +835,7 @@ END
         deserialize => sub { join "\n", split /\\n/, $_[0] },
         default => <<'END',
 M104 S0 ; turn off temperature
+M140 S0 ;
 G28 X0  ; home X axis
 M84     ; disable motors
 END
@@ -870,7 +886,7 @@ END
         type    => 'f',
         serialize   => $serialize_comma,
         deserialize => $deserialize_comma,
-        default => [1],
+        default => [2],
     },
     'retract_speed' => {
         label   => 'Speed',
@@ -911,7 +927,7 @@ END
         type    => 'f',
         serialize   => $serialize_comma,
         deserialize => $deserialize_comma,
-        default => [0],
+        default => [0.21],
     },
     'retract_layer_change' => {
         label   => 'Retract on layer change',
@@ -920,7 +936,7 @@ END
         type    => 'bool',
         serialize   => $serialize_comma_bool,
         deserialize => $deserialize_comma,
-        default => [1],
+        default => [0],
     },
     'wipe' => {
         label   => 'Wipe while retracting',
@@ -958,7 +974,7 @@ END
         tooltip => 'This flag enables the automatic cooling logic that adjusts print speed and fan speed according to layer printing time.',
         cli     => 'cooling!',
         type    => 'bool',
-        default => 1,
+        default => 0,
     },
     'min_fan_speed' => {
         label   => 'Min',
@@ -967,7 +983,7 @@ END
         cli     => 'min-fan-speed=i',
         type    => 'i',
         max     => 100,
-        default => 35,
+        default => 60,
     },
     'max_fan_speed' => {
         label   => 'Max',
@@ -995,7 +1011,7 @@ END
         type    => 'i',
         max     => 1000,
         width   => 60,
-        default => 60,
+        default => 30,
     },
     'slowdown_below_layer_time' => {
         label   => 'Slow down if layer print time is below',
@@ -1005,7 +1021,7 @@ END
         type    => 'i',
         max     => 1000,
         width   => 60,
-        default => 30,
+        default => 10,
     },
     'min_print_speed' => {
         label   => 'Min print speed',
@@ -1014,7 +1030,7 @@ END
         cli     => 'min-print-speed=f',
         type    => 'i',
         max     => 1000,
-        default => 10,
+        default => 30,
     },
     'disable_fan_first_layers' => {
         label   => 'Disable fan for the first',
@@ -1023,14 +1039,14 @@ END
         cli     => 'disable-fan-first-layers=i',
         type    => 'i',
         max     => 1000,
-        default => 1,
+        default => 4,
     },
     'fan_always_on' => {
         label   => 'Keep fan always on',
         tooltip => 'If this is enabled, fan will never be disabled and will be kept running at least at its minimum speed. Useful for PLA, harmful for ABS.',
         cli     => 'fan-always-on!',
         type    => 'bool',
-        default => 0,
+        default => 1,
     },
     
     # skirt/brim options
@@ -1105,7 +1121,7 @@ END
         type    => 'point',
         serialize   => $serialize_comma,
         deserialize => sub { [ split /[,x]/, $_[0] ] },
-        default => [200,200],
+        default => [180,180],
     },
     'duplicate_grid' => {
         label   => 'Copies (grid)',
@@ -1151,6 +1167,7 @@ END
     },
 };
 
+
 # generate accessors
 if (eval "use Class::XSAccessor; 1") {
     Class::XSAccessor->import(
@@ -1191,6 +1208,7 @@ sub new_from_cli {
     for (qw(start end layer toolchange)) {
         my $opt_key = "${_}_gcode";
         if ($args{$opt_key}) {
+            
             if (-e $args{$opt_key}) {
                 Slic3r::open(\my $fh, "<", $args{$opt_key})
                     or die "Failed to open $args{$opt_key}\n";
@@ -1214,11 +1232,14 @@ sub merge {
     return $config;
 }
 
+#load external config files
 sub load {
     my $class = shift;
     my ($file) = @_;
     
+    # __PACKAGE__ is a refernce to the currnt package
     my $ini = __PACKAGE__->read_ini($file);
+    
     my $config = __PACKAGE__->new;
     $config->set($_, $ini->{_}{$_}, 1) for keys %{$ini->{_}};
     return $config;
@@ -1568,6 +1589,7 @@ sub write_ini {
     close $fh;
 }
 
+#reads an ini file don't ask me how !
 sub read_ini {
     my $class = shift;
     my ($file) = @_;

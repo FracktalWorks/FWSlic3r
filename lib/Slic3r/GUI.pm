@@ -360,8 +360,11 @@ sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
     
+
     $self->{busy} = 0;
+    #The wxTimer class allows you to execute code at specified intervals. 
     $self->{timer} = Wx::Timer->new($self);
+    #A gauge is a horizontal or vertical bar which shows a quantity (often time).
     $self->{prog} = Wx::Gauge->new($self, wxGA_HORIZONTAL, 100, wxDefaultPosition, wxDefaultSize);
     $self->{prog}->Hide;
     $self->{cancelbutton} = Wx::Button->new($self, -1, "Cancel", wxDefaultPosition, wxDefaultSize);
