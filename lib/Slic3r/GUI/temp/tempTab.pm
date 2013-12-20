@@ -341,7 +341,7 @@ sub load_presets {
     
     $self->{presets} = [{
         default => 1,
-        name    => 'ABS',
+        name    => '- default -',
     }];
     
     opendir my $dh, "$Slic3r::GUI::datadir/" . $self->name or die "Failed to read directory $Slic3r::GUI::datadir/" . $self->name . " (errno: $!)\n";
