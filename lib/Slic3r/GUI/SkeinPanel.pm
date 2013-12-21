@@ -426,9 +426,9 @@ sub config {
         $config->set('avoid_crossing_perimeters', 1);
         $config->set('infill_every_layers', 10);
     } else {
-        my $extruders_count = $self->{options_tabs}{settings}{extruders_count};
-        $config->set("${_}_extruder", min($config->get("${_}_extruder"), $extruders_count))
-            for qw(perimeter infill support_material support_material_interface);
+        # my $extruders_count = $self->{options_tabs}{settings}{extruders_count};
+        # $config->set("${_}_extruder", min($config->get("${_}_extruder"), $extruders_count))
+        #     for qw(perimeter infill support_material support_material_interface);
     }
     
     return $config;

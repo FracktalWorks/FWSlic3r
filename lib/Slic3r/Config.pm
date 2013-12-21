@@ -273,7 +273,7 @@ our $Options = {
         cli     => 'travel-speed=f',
         type    => 'f',
         aliases => [qw(travel_feed_rate)],
-        default => 130,
+        default => 150,
     },
     'perimeter_speed' => {
         label   => 'Perimeters',
@@ -282,7 +282,7 @@ our $Options = {
         cli     => 'perimeter-speed=f',
         type    => 'f',
         aliases => [qw(perimeter_feed_rate)],
-        default => 30,
+        default => 50,
     },
     'small_perimeter_speed' => {
         label   => 'Small perimeters',
@@ -319,7 +319,7 @@ our $Options = {
         type    => 'f',
         ratio_over => 'infill_speed',
         aliases => [qw(solid_infill_feed_rate)],
-        default => 60,
+        default => 75,
     },
     'top_solid_infill_speed' => {
         label   => 'Top solid infill',
@@ -345,7 +345,7 @@ our $Options = {
         cli     => 'bridge-speed=f',
         type    => 'f',
         aliases => [qw(bridge_feed_rate)],
-        default => 60,
+        default => 70,
     },
     'gap_fill_speed' => {
         label   => 'Gap fill',
@@ -361,7 +361,7 @@ our $Options = {
         sidetext => 'mm/s or %',
         cli     => 'first-layer-speed=s',
         type    => 'f',
-        default => '30%',
+        default => '50%',
     },
     
     # acceleration options
@@ -435,6 +435,7 @@ our $Options = {
         ratio_over => 'layer_height',
         default => 0.35,
         readonly => 1,
+        invisible => 1,
     },
     'infill_every_layers' => {
         label   => 'Combine infill every',

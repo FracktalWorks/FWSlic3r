@@ -31,6 +31,7 @@ Slic3r::GUI::OptionsGroup - pre-filled Wx::StaticBoxSizer wrapper containing one
                 default     => 0.4,             # mandatory
                 readonly    => 0,
                 on_change   => sub { print "new value is $_[0]\n" },
+                invisible   => 0,
             },
         ],
         on_change   => sub { print "new value for $_[0] is $_[1]\n" },
@@ -170,12 +171,13 @@ sub _build_field {
         $style = wxTE_MULTILINE if $opt->{multiline};
         # default width on Windows is too large
         my $size = Wx::Size->new($opt->{width} || 60, $opt->{height} || -1);
-        
+
         $field = $opt->{type} eq 'i'
             ? Wx::SpinCtrl->new($self->parent, -1, $opt->{default}, wxDefaultPosition, $size, $style, $opt->{min} || 0, $opt->{max} || 2147483647, $opt->{default})
             : Wx::TextCtrl->new($self->parent, -1, $opt->{default}, wxDefaultPosition, $size, $style);
         $field->Disable if $opt->{readonly};
-        
+
+
         my $on_change = sub { $self->_on_change($opt_key, $field->GetValue) };
         if ($opt->{type} eq 'i') {
             $self->_setters->{$opt_key} = sub { $field->SetValue($_[0]) };
@@ -185,6 +187,7 @@ sub _build_field {
             EVT_TEXT ($self->parent, $field, $on_change);
         }
         $tooltip .= " (default: " . $opt->{default} .  ")" if ($opt->{default});
+        # $field->Hide if $opt->{readonly};
     } elsif ($opt->{type} eq 'bool') {
         $field = Wx::CheckBox->new($self->parent, -1, "");
         $field->SetValue($opt->{default});
@@ -192,6 +195,7 @@ sub _build_field {
         EVT_CHECKBOX($self->parent, $field, sub { $self->_on_change($opt_key, $field->GetValue); });
         $self->_setters->{$opt_key} = sub { $field->SetValue($_[0]) };
         $tooltip .= " (default: " . ($opt->{default} ? 'yes' : 'no') .  ")" if defined($opt->{default});
+        # $field->Hide if $opt->{readonly};    
     } elsif ($opt->{type} eq 'point') {
         $field = Wx::BoxSizer->new(wxHORIZONTAL);
         my $field_size = Wx::Size->new(40, -1);
@@ -213,6 +217,7 @@ sub _build_field {
             $x_field->SetValue($_[0][0]);
             $y_field->SetValue($_[0][1]);
         };
+                # $field->Hide if $opt->{readonly};
     } elsif ($opt->{type} eq 'select') {
         $field = Wx::ComboBox->new($self->parent, -1, "", wxDefaultPosition, wxDefaultSize, $opt->{labels} || $opt->{values}, wxCB_READONLY);
         EVT_COMBOBOX($self->parent, $field, sub {
@@ -226,6 +231,7 @@ sub _build_field {
         $tooltip .= " (default: " 
                  . $opt->{labels}[ first { $opt->{values}[$_] eq $opt->{default} } 0..$#{$opt->{values}} ] 
                  . ")" if ($opt->{default});
+        # $field->Hide if $opt->{readonly};
     } else {
         die "Unsupported option type: " . $opt->{type};
     }

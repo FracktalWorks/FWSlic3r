@@ -396,171 +396,42 @@ sub title { 'Settings' }
 
 sub build {
     my $self = shift;
+    # $self->{extruders_count} = 1;
+    # $self->{extruder_pages} = [];
+    # $self->_build_extruder_pages;
 
-$self->add_options_page('Layers and perimeters', 'layers.png', optgroups => [
+    $self->add_options_page('Print Settings', 'layers.png', optgroups => [
         {
-            title => 'Layer height',
-            options => [qw(layer_height first_layer_height)],
+            title => 'Layers and Perimeters',
+            options => [qw(layer_height spiral_vase)],
         },
-        {
-            title => 'Vertical shells',
-            options => [qw(perimeters spiral_vase)],
-        },
-        {
-            title => 'Horizontal shells',
-            options => [qw(top_solid_layers bottom_solid_layers)],
-            lines => [
-                {
-                    label   => 'Solid layers',
-                    options => [qw(top_solid_layers bottom_solid_layers)],
-                },
-            ],
-        },
-        {
-            title => 'Quality (slower slicing)',
-            options => [qw(extra_perimeters avoid_crossing_perimeters start_perimeters_at_concave_points start_perimeters_at_non_overhang thin_walls overhangs)],
-            lines => [
-                Slic3r::GUI::OptionsGroup->single_option_line('extra_perimeters'),
-                Slic3r::GUI::OptionsGroup->single_option_line('avoid_crossing_perimeters'),
-                {
-                    label   => 'Start perimeters at',
-                    options => [qw(start_perimeters_at_concave_points start_perimeters_at_non_overhang)],
-                },
-                Slic3r::GUI::OptionsGroup->single_option_line('thin_walls'),
-                Slic3r::GUI::OptionsGroup->single_option_line('overhangs'),
-            ],
-        },
-        {
-            title => 'Advanced',
-            options => [qw(randomize_start external_perimeters_first)],
-        },
-    ]);
-    
-    $self->add_options_page('Infill', 'shading.png', optgroups => [
         {
             title => 'Infill',
-            options => [qw(fill_density fill_pattern solid_fill_pattern)],
+            options => [qw(fill_density infill_every_layers infill_only_where_needed solid_infill_every_layers solid_infill_below_area only_retract_when_crossing_perimeters infill_first)],
         },
-        {
-            title => 'Reducing printing time',
-            options => [qw(infill_every_layers infill_only_where_needed)],
-        },
-        {
-            title => 'Advanced',
-            options => [qw(solid_infill_every_layers fill_angle
-                solid_infill_below_area only_retract_when_crossing_perimeters infill_first)],
-        },
-    ]);
-    
-    $self->add_options_page('Speed', 'time.png', optgroups => [
-        {
-            title => 'Speed for print moves',
-            options => [qw(perimeter_speed small_perimeter_speed external_perimeter_speed infill_speed solid_infill_speed top_solid_infill_speed support_material_speed bridge_speed gap_fill_speed)],
-        },
-        {
-            title => 'Speed for non-print moves',
-            options => [qw(travel_speed)],
-        },
-        {
-            title => 'Modifiers',
-            options => [qw(first_layer_speed)],
-        },
-        {
-            title => 'Acceleration control (advanced)',
-            options => [qw(perimeter_acceleration infill_acceleration bridge_acceleration first_layer_acceleration default_acceleration)],
-        },
-    ]);
-    
-    $self->add_options_page('Skirt and brim', 'box.png', optgroups => [
-        {
-            title => 'Skirt',
-            options => [qw(skirts skirt_distance skirt_height min_skirt_length)],
-        },
-        {
-            title => 'Brim',
-            options => [qw(brim_width)],
-        },
-    ]);
-    
-    $self->add_options_page('Support material', 'building.png', optgroups => [
         {
             title => 'Support material',
-            options => [qw(support_material support_material_threshold support_material_enforce_layers)],
+            options => [qw(support_material)],
         },
-        {
-            title => 'Raft',
-            options => [qw(raft_layers)],
-        },
-        {
-            title => 'Options for support material and raft',
-            options => [qw(support_material_pattern support_material_spacing support_material_angle
-                support_material_interface_layers support_material_interface_spacing)],
-        },
+        # {
+        #     title => 'Speed for print moves',
+        #     options => [qw(perimeter_speed small_perimeter_speed external_perimeter_speed infill_speed solid_infill_speed top_solid_infill_speed support_material_speed bridge_speed gap_fill_speed)],
+        # },
+        # {
+        #     title => 'Speed for non-print moves',
+        #     options => [qw(travel_speed)],
+        # },
+        # {
+        #     title => 'Modifiers',
+        #     options => [qw(first_layer_speed)],
+        # },
+        # {
+        #     title => 'Acceleration control (advanced)',
+        #     options => [qw(perimeter_acceleration infill_acceleration bridge_acceleration first_layer_acceleration default_acceleration)],
+        # }, 
     ]);
     
-    $self->add_options_page('Notes', 'note.png', optgroups => [
-        {
-            title => 'Notes',
-            no_labels => 1,
-            options => [qw(notes)],
-        },
-    ]);
-    
-    $self->add_options_page('Output options', 'page_white_go.png', optgroups => [
-        {
-            title => 'Sequential printing',
-            options => [qw(complete_objects extruder_clearance_radius extruder_clearance_height)],
-            lines => [
-                Slic3r::GUI::OptionsGroup->single_option_line('complete_objects'),
-                {
-                    label   => 'Extruder clearance (mm)',
-                    options => [qw(extruder_clearance_radius extruder_clearance_height)],
-                },
-            ],
-        },
-        {
-            title => 'Output file',
-            options => [qw(gcode_comments output_filename_format)],
-        },
-        {
-            title => 'Post-processing scripts',
-            no_labels => 1,
-            options => [qw(post_process)],
-        },
-    ]);
-    
-    $self->add_options_page('Multiple Extruders', 'funnel.png', optgroups => [
-        {
-            title => 'Extruders',
-            options => [qw(perimeter_extruder infill_extruder support_material_extruder support_material_interface_extruder)],
-        },
-        {
-            title => 'Ooze prevention',
-            options => [qw(ooze_prevention standby_temperature_delta)],
-        },
-    ]);
-    
-    $self->add_options_page('Advanced', 'wrench.png', optgroups => [
-        {
-            title => 'Extrusion width',
-            label_width => 180,
-            options => [qw(extrusion_width first_layer_extrusion_width perimeter_extrusion_width infill_extrusion_width solid_infill_extrusion_width top_infill_extrusion_width support_material_extrusion_width)],
-        },
-        {
-            title => 'Flow',
-            options => [qw(bridge_flow_ratio)],
-        },
-        {
-            title => 'Other',
-            options => [($Slic3r::have_threads ? qw(threads) : ()), qw(resolution)],
-        },
-    ]);
-
     $self->add_options_page('Filament', 'spool.png', optgroups => [
-        {
-            title => 'Filament',
-            options => ['filament_diameter#0', 'extrusion_multiplier#0'],
-        },
         {
             title => 'Temperature (°C)',
             options => ['temperature#0', 'first_layer_temperature#0', qw(bed_temperature first_layer_bed_temperature)],
@@ -575,101 +446,15 @@ $self->add_options_page('Layers and perimeters', 'layers.png', optgroups => [
                 },
             ],
         },
-    ]);
-    
-    $self->add_options_page('Cooling', 'hourglass.png', optgroups => [
         {
-            title => 'Enable',
-            options => [qw(fan_always_on cooling)],
-            lines => [
-                Slic3r::GUI::OptionsGroup->single_option_line('fan_always_on'),
-                Slic3r::GUI::OptionsGroup->single_option_line('cooling'),
-                {
-                    label => '',
-                    widget => ($self->{description_line} = Slic3r::GUI::OptionsGroup::StaticTextLine->new),
-                },
-            ],
+            title => 'Skirt',
+            options => [qw(skirts skirt_distance skirt_height min_skirt_length)],
         },
         {
-            title => 'Fan settings',
-            options => [qw(min_fan_speed max_fan_speed bridge_fan_speed disable_fan_first_layers)],
-            lines => [
-                {
-                    label   => 'Fan speed',
-                    options => [qw(min_fan_speed max_fan_speed)],
-                },
-                Slic3r::GUI::OptionsGroup->single_option_line('bridge_fan_speed'),
-                Slic3r::GUI::OptionsGroup->single_option_line('disable_fan_first_layers'),
-            ],
-        },
-        {
-            title => 'Cooling thresholds',
-            label_width => 250,
-            options => [qw(fan_below_layer_time slowdown_below_layer_time min_print_speed)],
+            title => 'Brim',
+            options => [qw(brim_width)],
         },
     ]);
-
-
-    $self->{extruders_count} = 1;
-    
-    $self->add_options_page('General', 'printer_empty.png', optgroups => [
-        {
-            title => 'Size and coordinates',
-            options => [qw(bed_size print_center z_offset)],
-        },
-        {
-            title => 'Firmware',
-            options => [qw(gcode_flavor use_relative_e_distances)],
-        },
-        {
-            title => 'Capabilities',
-            options => [
-                {
-                    opt_key => 'extruders_count',
-                    label   => 'Extruders',
-                    tooltip => 'Number of extruders of the printer.',
-                    type    => 'i',
-                    min     => 1,
-                    default => 1,
-                    on_change => sub { $self->{extruders_count} = $_[0] },
-                },
-            ],
-        },
-        {
-            title => 'Advanced',
-            options => [qw(use_firmware_retraction vibration_limit)],
-        },
-    ]);
-    
-    $self->add_options_page('Custom G-code', 'cog.png', optgroups => [
-        {
-            title => 'Start G-code',
-            no_labels => 1,
-            options => [qw(start_gcode)],
-        },
-        {
-            title => 'End G-code',
-            no_labels => 1,
-            options => [qw(end_gcode)],
-        },
-        {
-            title => 'Layer change G-code',
-            no_labels => 1,
-            options => [qw(layer_gcode)],
-        },
-        {
-            title => 'Tool change G-code',
-            no_labels => 1,
-            options => [qw(toolchange_gcode)],
-        },
-    ]);
-    
-    $self->{extruder_pages} = [];
-    $self->_build_extruder_pages;
-
-
-
-
 }
 
 sub _update_description {
@@ -698,7 +483,7 @@ sub _update_description {
     } else {
         $msg = "Fan $fan_other_layers";
     }
-    $self->{description_line}->SetText($msg);
+    # $self->{description_line}->SetText($msg);
 }
 
 sub on_value_change {
@@ -719,10 +504,10 @@ sub config {
     
     my $config = $self->SUPER::config(@_);
     
-    # remove all unused values
-    foreach my $opt_key ($self->_extruder_options) {
-        splice @{ $config->{$opt_key} }, $self->{extruders_count};
-    }
+    # # remove all unused values
+    # foreach my $opt_key ($self->_extruder_options) {
+    #     splice @{ $config->{$opt_key} }, $self->{extruders_count};
+    # }
     
     return $config;
 }
@@ -791,14 +576,14 @@ sub on_value_change_printer {
 sub on_preset_loaded {
     my $self = shift;
     
-    # update the extruders count field
-    {
-        # update the GUI field according to the number of nozzle diameters supplied
-        $self->set_value('extruders_count', scalar @{ $self->{config}->nozzle_diameter });
+    # # update the extruders count field
+    # {
+    #     # update the GUI field according to the number of nozzle diameters supplied
+    #     $self->set_value('extruders_count', scalar @{ $self->{config}->nozzle_diameter });
         
-        # update extruder page list
-        $self->on_value_change_printer('extruders_count');
-    }
+    #     # update extruder page list
+    #     $self->on_value_change_printer('extruders_count');
+    # }
 }
 
 sub load_config_file {
