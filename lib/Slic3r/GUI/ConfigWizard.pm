@@ -7,22 +7,22 @@ use Wx;
 use base 'Wx::Wizard';
 
 # adhere to various human interface guidelines
-our $wizard = 'Wizard';
-$wizard = 'Assistant' if &Wx::wxMAC || &Wx::wxGTK;
+our $wizard = 'Custom Filament';
+$wizard = 'Custom Filament' if &Wx::wxMAC || &Wx::wxGTK;
 
 sub new {
     my $class = shift;
     my ($parent) = @_;
-    my $self = $class->SUPER::new($parent, -1, "Configuration $wizard");
+    my $self = $class->SUPER::new($parent, -1, "Configuration Wizard");
 
     # initialize an empty repository
     $self->{config} = Slic3r::Config->new;
 
     $self->add_page(Slic3r::GUI::ConfigWizard::Page::Welcome->new($self));
-    $self->add_page(Slic3r::GUI::ConfigWizard::Page::Firmware->new($self));
-    $self->add_page(Slic3r::GUI::ConfigWizard::Page::Bed->new($self));
-    $self->add_page(Slic3r::GUI::ConfigWizard::Page::Nozzle->new($self));
-    $self->add_page(Slic3r::GUI::ConfigWizard::Page::Filament->new($self));
+    # $self->add_page(Slic3r::GUI::ConfigWizard::Page::Firmware->new($self));
+    # $self->add_page(Slic3r::GUI::ConfigWizard::Page::Bed->new($self));
+    # $self->add_page(Slic3r::GUI::ConfigWizard::Page::Nozzle->new($self));
+    # $self->add_page(Slic3r::GUI::ConfigWizard::Page::Filament->new($self));
     $self->add_page(Slic3r::GUI::ConfigWizard::Page::Temperature->new($self));
     $self->add_page(Slic3r::GUI::ConfigWizard::Page::BedTemperature->new($self));
     $self->add_page(Slic3r::GUI::ConfigWizard::Page::Finished->new($self));
@@ -259,10 +259,10 @@ use base 'Slic3r::GUI::ConfigWizard::Page';
 sub new {
     my $class = shift;
     my ($parent) = @_;
-    my $self = $class->SUPER::new($parent, "Welcome to the Slic3r Configuration $wizard", 'Welcome');
+    my $self = $class->SUPER::new($parent, "Welcome to the Filament Configuration Wizard", 'Welcome');
 
-    $self->append_text('Hello, welcome to Slic3r! This '.lc($wizard).' helps you with the initial configuration; just a few settings and you will be ready to print.');
-    $self->append_text('To import an existing configuration instead, cancel this '.lc($wizard).' and use the Open Config menu item found in the File menu.');
+    $self->append_text('Hello, welcome to FWSlic3r! This wizard helps you with the initial configuration; just a few settings and you will be ready to print.');
+    $self->append_text('To import an existing configuration instead, cancel this wizard and use the Open Config menu item found in the File menu.');
     $self->append_text('To continue, click Next.');
 
     return $self;
@@ -363,9 +363,9 @@ sub new {
     my ($parent) = @_;
     my $self = $class->SUPER::new($parent, 'Congratulations!', 'Finish');
 
-    $self->append_text("You have successfully completed the Slic3r Configuration $wizard. " .
-                       'Slic3r is now configured for your printer and filament.');
-    $self->append_text('To close this '.lc($wizard).' and apply the newly created configuration, click Finish.');
+    $self->append_text("You have successfully completed the FWSlic3r Configuration Wizard " .
+                       'FWSlic3r is now configured for your filament.');
+    $self->append_text('To close this wizard and apply the newly created configuration, click Finish.');
 
     return $self;
 }

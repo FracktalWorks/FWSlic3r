@@ -339,10 +339,17 @@ sub is_dirty {
 sub load_presets {
     my $self = shift;
     
-    $self->{presets} = [{
+    $self->{presets} = [
+    {
         default => 1,
         name    => 'ABS',
-    }];
+    },
+
+    # {
+    #     default => 2,
+    #     name    => 'PLA',     
+    # }
+    ];
     
     opendir my $dh, "$Slic3r::GUI::datadir/" . $self->name or die "Failed to read directory $Slic3r::GUI::datadir/" . $self->name . " (errno: $!)\n";
     foreach my $file (sort grep /\.ini$/i, readdir $dh) {

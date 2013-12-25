@@ -53,7 +53,7 @@ our @cb;
 our $Settings = {
     _ => {
         mode => 'expert',
-        version_check => 1,
+        version_check => 0,
     },
 };
 
@@ -66,7 +66,7 @@ $medium_font->SetPointSize(12);
 sub OnInit {
     my $self = shift;
     
-    $self->SetAppName('Slic3r');
+    $self->SetAppName('FWSlic3r');
     Slic3r::debugf "wxWidgets version %s, Wx version %s\n", &Wx::wxVERSION_STRING, $Wx::VERSION;
     
     $self->{notifier} = Slic3r::GUI::Notifier->new;
@@ -94,7 +94,7 @@ sub OnInit {
     
     # application frame
     Wx::Image::AddHandler(Wx::PNGHandler->new);
-    my $frame = Wx::Frame->new(undef, -1, 'Slic3r', wxDefaultPosition, [760, 470], wxDEFAULT_FRAME_STYLE);
+    my $frame = Wx::Frame->new(undef, -1, 'FWSlic3r', wxDefaultPosition, [760, 470], wxDEFAULT_FRAME_STYLE);
     $frame->SetIcon(Wx::Icon->new("$Slic3r::var/Slic3r_128px.png", wxBITMAP_TYPE_PNG) );
     $self->{skeinpanel} = Slic3r::GUI::SkeinPanel->new($frame,
         mode        => $mode // $Settings->{_}{mode},
@@ -104,7 +104,7 @@ sub OnInit {
     
     # status bar
     $frame->{statusbar} = Slic3r::GUI::ProgressStatusBar->new($frame, -1);
-    $frame->{statusbar}->SetStatusText("Version $Slic3r::VERSION - Remember to check for updates at http://slic3r.org/");
+    $frame->{statusbar}->SetStatusText("FWSlic3r");
     $frame->SetStatusBar($frame->{statusbar});
     
     # File menu
@@ -122,10 +122,10 @@ sub OnInit {
         $fileMenu->AppendSeparator();
         $fileMenu->Append(MI_REPAIR_STL, "Repair STL file…", 'Automatically repair an STL file');
         $fileMenu->Append(MI_COMBINE_STLS, "Combine multi-material STL files…", 'Combine multiple STL files into a single multi-material AMF file');
+        # $fileMenu->AppendSeparator();
+        # $fileMenu->Append(wxID_PREFERENCES, "Preferences…", 'Application preferences');
         $fileMenu->AppendSeparator();
-        $fileMenu->Append(wxID_PREFERENCES, "Preferences…", 'Application preferences');
-        $fileMenu->AppendSeparator();
-        $fileMenu->Append(wxID_EXIT, "&Quit", 'Quit Slic3r');
+        $fileMenu->Append(wxID_EXIT, "&Quit", 'Quit FWSlic3r');
         EVT_MENU($frame, MI_LOAD_CONF, sub { $self->{skeinpanel}->load_config_file });
         EVT_MENU($frame, MI_EXPORT_CONF, sub { $self->{skeinpanel}->export_config });
         EVT_MENU($frame, MI_QUICK_SLICE, sub { $self->{skeinpanel}->quick_slice;
@@ -153,32 +153,32 @@ sub OnInit {
     }
     
     # Window menu
-    my $windowMenu = Wx::Menu->new;
-    {
-        my $tab_count = $no_plater ? 3 : 4;
-        $windowMenu->Append(MI_TAB_PLATER, "Select &Plater Tab\tCtrl+1", 'Show the plater') unless $no_plater;
-        $windowMenu->Append(MI_TAB_PRINT, "Select P&rint Settings Tab\tCtrl+2", 'Show the print settings');
-        $windowMenu->Append(MI_TAB_FILAMENT, "Select &Filament Settings Tab\tCtrl+3", 'Show the filament settings');
-        $windowMenu->Append(MI_TAB_PRINTER, "Select Print&er Settings Tab\tCtrl+4", 'Show the printer settings');
-        EVT_MENU($frame, MI_TAB_PLATER, sub { $self->{skeinpanel}->select_tab(0) }) unless $no_plater;
-        EVT_MENU($frame, MI_TAB_PRINT, sub { $self->{skeinpanel}->select_tab($tab_count-3) });
-        EVT_MENU($frame, MI_TAB_FILAMENT, sub { $self->{skeinpanel}->select_tab($tab_count-2) });
-        EVT_MENU($frame, MI_TAB_PRINTER, sub { $self->{skeinpanel}->select_tab($tab_count-1) });
-    }
+    # my $windowMenu = Wx::Menu->new;
+    # {
+    #     my $tab_count = $no_plater ? 3 : 4;
+    #     $windowMenu->Append(MI_TAB_PLATER, "Select &Plater Tab\tCtrl+1", 'Show the plater') unless $no_plater;
+    #     $windowMenu->Append(MI_TAB_PRINT, "Select P&rint Settings Tab\tCtrl+2", 'Show the print settings');
+    #     $windowMenu->Append(MI_TAB_FILAMENT, "Select &Filament Settings Tab\tCtrl+3", 'Show the filament settings');
+    #     $windowMenu->Append(MI_TAB_PRINTER, "Select Print&er Settings Tab\tCtrl+4", 'Show the printer settings');
+    #     EVT_MENU($frame, MI_TAB_PLATER, sub { $self->{skeinpanel}->select_tab(0) }) unless $no_plater;
+    #     EVT_MENU($frame, MI_TAB_PRINT, sub { $self->{skeinpanel}->select_tab($tab_count-3) });
+    #     EVT_MENU($frame, MI_TAB_FILAMENT, sub { $self->{skeinpanel}->select_tab($tab_count-2) });
+    #     EVT_MENU($frame, MI_TAB_PRINTER, sub { $self->{skeinpanel}->select_tab($tab_count-1) });
+    # }
     
     # Help menu
     my $helpMenu = Wx::Menu->new;
     {
-        $helpMenu->Append(MI_CONF_WIZARD, "&Configuration $Slic3r::GUI::ConfigWizard::wizard…", "Run Configuration $Slic3r::GUI::ConfigWizard::wizard");
+        $helpMenu->Append(MI_CONF_WIZARD, "&Configure $Slic3r::GUI::ConfigWizard::wizard…", "Configure custom filament settings");
         $helpMenu->AppendSeparator();
-        $helpMenu->Append(MI_WEBSITE, "Slic3r &Website", 'Open the Slic3r website in your browser');
-        my $versioncheck = $helpMenu->Append(MI_VERSIONCHECK, "Check for &Updates...", 'Check for new Slic3r versions');
-        $versioncheck->Enable(Slic3r::GUI->have_version_check);
-        $helpMenu->Append(MI_DOCUMENTATION, "Slic3r &Manual", 'Open the Slic3r manual in your browser');
+        $helpMenu->Append(MI_WEBSITE, "Fracktal &Website", 'Open the Fracktal Works website in your browser');
+        # my $versioncheck = $helpMenu->Append(MI_VERSIONCHECK, "Check for &Updates...", 'Check for new Slic3r versions');
+        # $versioncheck->Enable(Slic3r::GUI->have_version_check);
+        # $helpMenu->Append(MI_DOCUMENTATION, "Slic3r &Manual", 'Open the Slic3r manual in your browser');
         $helpMenu->AppendSeparator();
-        $helpMenu->Append(wxID_ABOUT, "&About Slic3r", 'Show about dialog');
+        $helpMenu->Append(wxID_ABOUT, "&About", 'Show about dialog');
         EVT_MENU($frame, MI_CONF_WIZARD, sub { $self->{skeinpanel}->config_wizard });
-        EVT_MENU($frame, MI_WEBSITE, sub { Wx::LaunchDefaultBrowser('http://slic3r.org/') });
+        EVT_MENU($frame, MI_WEBSITE, sub { Wx::LaunchDefaultBrowser('http://fracktal.in/') });
         EVT_MENU($frame, MI_VERSIONCHECK, sub { Slic3r::GUI->check_version(manual => 1) });
         EVT_MENU($frame, MI_DOCUMENTATION, sub { Wx::LaunchDefaultBrowser('http://manual.slic3r.org/') });
         EVT_MENU($frame, wxID_ABOUT, \&about);
@@ -191,7 +191,7 @@ sub OnInit {
         my $menubar = Wx::MenuBar->new;
         $menubar->Append($fileMenu, "&File");
         $menubar->Append($platerMenu, "&Plater") if $platerMenu;
-        $menubar->Append($windowMenu, "&Window");
+        # $menubar->Append($windowMenu, "&Window");
         $menubar->Append($helpMenu, "&Help");
         $frame->SetMenuBar($menubar);
     }

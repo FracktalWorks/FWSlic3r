@@ -12,7 +12,7 @@ use base 'Wx::Dialog';
 sub new {
     my $class = shift;
     my ($parent) = @_;
-    my $self = $class->SUPER::new($parent, -1, 'About Slic3r', wxDefaultPosition, [600, 270]);
+    my $self = $class->SUPER::new($parent, -1, 'About FWSlic3r', wxDefaultPosition, [600, 270]);
 
     $self->SetBackgroundColour(Wx::wxWHITE);
     my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
@@ -27,7 +27,7 @@ sub new {
     $hsizer->Add($vsizer, 1, wxEXPAND, 0);
 
     # title
-    my $title = Wx::StaticText->new($self, -1, 'Slic3r', wxDefaultPosition, wxDefaultSize);
+    my $title = Wx::StaticText->new($self, -1, 'FWSlic3r', wxDefaultPosition, wxDefaultSize);
     my $title_font = Wx::SystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     $title_font->SetWeight(wxFONTWEIGHT_BOLD);
     $title_font->SetFamily(wxFONTFAMILY_ROMAN);
@@ -47,12 +47,9 @@ sub new {
         '<html>' .
         '<body bgcolor="#ffffff" link="#808080">' .
         '<font color="#808080">' .
-        'Copyright &copy; 2011-2013 Alessandro Ranellucci. All rights reserved. ' .
-        '<a href="http://slic3r.org/">Slic3r</a> is licensed under the ' .
+        '<a href="http://www.fracktal.in/">FWSlic3r</a> is licensed under the ' .
         '<a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License, version 3</a>.' .
         '<br /><br /><br />' .
-        'Slic3r logo designed by Corey Daniels, <a href="http://www.famfamfam.com/lab/icons/silk/">Silk Icon Set</a> designed by Mark James. ' .
-        'Contributions by Henrik Brix Andersen, Nicolas Dandrimont, Mark Hindess, Mike Sheldrake and numerous others.' .
         '</font>' .
         '</body>' .
         '</html>';

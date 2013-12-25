@@ -533,14 +533,14 @@ our $Options = {
         sidetext => 'mm or % (leave 0 for default)',
         cli     => 'support-material-extrusion-width=s',
         type    => 'f',
-        default => 0,
+        default => '60%',
     },
     'bridge_flow_ratio' => {
         label   => 'Bridge flow ratio',
         tooltip => 'This factor affects the amount of plastic for bridging. You can decrease it slightly to pull the extrudates and prevent sagging, although default settings are usually good and you should experiment with cooling (use a fan) before tweaking this.',
         cli     => 'bridge-flow-ratio=f',
         type    => 'f',
-        default => 1,
+        default => 0.85,
     },
     'vibration_limit' => {
         label   => 'Vibration limit',

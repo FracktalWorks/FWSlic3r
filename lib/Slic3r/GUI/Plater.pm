@@ -623,6 +623,8 @@ sub export_gcode {
     
     # select output file
     $self->{output_file} = $main::opt{output};
+    #if (!(defined $self->{output_file} && $self->{output_file} ne "")){return;}
+
     {
         $self->{output_file} = $self->skeinpanel->init_print->expanded_output_filepath($self->{output_file}, $self->{objects}[0]->input_file);
         my $dlg = Wx::FileDialog->new($self, 'Save G-code file as:', Slic3r::GUI->output_path(dirname($self->{output_file})),
@@ -786,6 +788,8 @@ sub _get_export_file {
     my $suffix = $format eq 'STL' ? '.stl' : '.amf.xml';
     
     my $output_file = $main::opt{output};
+     #if (!(defined $self->{output_file} && $self->{output_file} ne "")){return;}
+
     {
         $output_file = $self->skeinpanel->init_print->expanded_output_filepath($output_file, $self->{objects}[0]->input_file);
         $output_file =~ s/\.gcode$/$suffix/i;
